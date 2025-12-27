@@ -13,8 +13,27 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 6
+  },
+  userType: {
+    type: String,
+    enum: ['public', 'private', 'team'],
+    required: true,
+    default: 'private'
+  },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    default: null
+  },
+  teamRole: {
+    type: String,
+    enum: ['member', 'admin'],
+    default: 'member'
   }
 }, { timestamps: true });
+
+// Compound index for efficient team queries
+UserSchema.index({ userType: 1, teamId: 1 });
 
 UserSchema.pre("save", async function() {
   if (!this.isModified("password")) return;

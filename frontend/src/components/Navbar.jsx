@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UserTypeBadge from './UserTypeBadge';
 import './Navbar.css';
 
 const Navbar = () => {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, userType, teamId } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -28,6 +29,10 @@ const Navbar = () => {
           <Link to="/history" className="navbar-link">
             History
           </Link>
+          <Link to="/team" className="navbar-link">
+            Team
+          </Link>
+          <UserTypeBadge userType={userType} />
           <button onClick={handleLogout} className="navbar-link navbar-logout">
             Logout
           </button>
