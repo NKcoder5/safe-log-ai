@@ -1,0 +1,56 @@
+/* Inherits basic modal styles from ChangePasswordModal.css if loaded, 
+   but specific overrides for danger theme */
+
+.danger-theme {
+    border-color: var(--error-border);
+    box-shadow: 0 0 0 1px var(--error-border), var(--shadow-xl);
+}
+
+.modal-description {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+}
+
+.text-white {
+    color: var(--text-primary);
+}
+
+.input-danger {
+    border-color: var(--error-border) !important;
+}
+
+.input-danger:focus {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete-confirm {
+    background: var(--error-bg);
+    color: var(--error);
+    border: 1px solid var(--error-border);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    transition: all 0.2s;
+}
+
+.btn-delete-confirm:hover:not(:disabled) {
+    background: var(--error);
+    color: white;
+}
+
+.btn-delete-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg-surface);
+    color: var(--text-tertiary);
+    border-color: var(--border-subtle);
+}
+
+.margin-top-4 {
+    margin-top: var(--space-4);
+}

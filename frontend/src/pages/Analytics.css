@@ -1,0 +1,115 @@
+.analytics-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    padding: var(--space-6);
+}
+
+.analytics-container {
+    max-width: var(--max-width-content);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* Header */
+.analytics-header {
+    animation: fadeInDown 400ms ease;
+}
+
+.analytics-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.analytics-title svg {
+    color: var(--accent-purple);
+}
+
+.analytics-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-tertiary);
+    margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-4);
+    animation: fadeInUp 400ms ease 100ms both;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: var(--accent-blue-muted);
+    border-radius: var(--radius-xl);
+    color: var(--accent-blue);
+    flex-shrink: 0;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.stat-value {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .analytics-page {
+        padding: var(--space-4);
+    }
+
+    .analytics-container {
+        gap: var(--space-4);
+    }
+
+    .analytics-title {
+        font-size: var(--text-3xl);
+    }
+
+    .analytics-subtitle {
+        font-size: var(--text-base);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

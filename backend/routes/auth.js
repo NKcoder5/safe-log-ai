@@ -3,8 +3,147 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Team = require("../models/Team");
+const authenticateToken = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
+
+// Get User Settings
+router.get("/settings", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json({
+      settings: {
+        compactMode: user.compactMode,
+        lastPasswordChange: user.lastPasswordChange
+      }
+    });
+  } catch (err) {
+    console.error("Get settings error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update Preferences
+router.put("/update-preferences", authenticateToken, async (req, res) => {
+  try {
+    const { compactMode } = req.body;
+    const updates = {};
+    if (typeof compactMode !== 'undefined') updates.compactMode = compactMode;
+
+    const user = await User.findByIdAndUpdate(req.userId, updates, { new: true });
+
+    res.json({
+      message: "Preferences updated",
+      settings: {
+        compactMode: user.compactMode
+      }
+    });
+  } catch (err) {
+    console.error("Update prefs error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update Password
+router.put("/update-password", authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Current and new passwords are required" });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Incorrect current password" });
+    }
+
+    user.password = newPassword;
+    user.lastPasswordChange = Date.now();
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Update password error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Delete Account
+router.delete("/delete-account", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (user.userType === 'team' && user.teamRole === 'admin') {
+      return res.status(403).json({ error: "Team admins cannot delete their account without dispersing the team first." });
+    }
+
+    await User.findByIdAndDelete(req.userId);
+    res.json({ message: "Account deleted successfully" });
+  } catch (err) {
+    console.error("Delete account error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update User Role (Private <-> Public)
+router.put("/update-role", authenticateToken, async (req, res) => {
+  try {
+    const { userType } = req.body;
+    const userId = req.userId;
+    const currentType = req.userType;
+
+    if (!['private', 'public'].includes(userType)) {
+      return res.status(400).json({ error: "Invalid role. Must be 'private' or 'public'." });
+    }
+
+    if (currentType === 'team') {
+      return res.status(403).json({ error: "Cannot change role while in a team. Please leave the team first." });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { userType: userType },
+      { new: true }
+    );
+
+    const token = jwt.sign(
+      {
+        userId: updatedUser._id.toString(),
+        email: updatedUser.email,
+        userType: updatedUser.userType,
+        teamId: null,
+        teamRole: null
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: updatedUser._id,
+        email: updatedUser.email,
+        userType: updatedUser.userType,
+        teamId: null,
+        teamRole: null
+      },
+      message: `Role updated to ${userType}`
+    });
+
+  } catch (err) {
+    console.error("Update role error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 // Signup
 router.post("/signup", async (req, res) => {

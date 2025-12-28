@@ -359,4 +359,76 @@ router.put("/:id", authenticateToken, async (req, res) => {
     }
 });
 
+// Disperse/Delete team (admin only)
+router.delete("/disperse", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const teamId = req.teamId;
+        const role = req.teamRole;
+
+        if (!teamId) {
+            return res.status(400).json({ error: "You are not part of any team" });
+        }
+
+        if (role !== 'admin') {
+            return res.status(403).json({ error: "Access denied. Only team admins can disperse the team." });
+        }
+
+        console.log(`\n💥 Dispersing team ${teamId} by admin ${userId}`);
+
+        // 1. Find all members
+        // const members = await User.find({ teamId }); // Not strictly needed to find first, just update all
+
+        // 2. Update all users in this team to 'private' and remove teamId
+        const result = await User.updateMany(
+            { teamId: teamId },
+            {
+                $set: {
+                    userType: 'private',
+                    teamId: null,
+                    teamRole: null
+                }
+            }
+        );
+
+        console.log(`Updated ${result.modifiedCount} users to private.`);
+
+        // 3. Delete the team
+        await Team.findByIdAndDelete(teamId);
+        console.log(`Team deleted.`);
+
+        // 4. Generate new token for the requester (Admin) who is now private
+        // We need to fetch the updated admin user to be sure (or just construct payload since we know the new state)
+        const updatedUser = await User.findById(userId);
+
+        const newToken = jwt.sign(
+            {
+                userId: updatedUser._id.toString(),
+                email: updatedUser.email,
+                userType: 'private',
+                teamId: null,
+                teamRole: null
+            },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.json({
+            token: newToken,
+            message: "Team dispersed successfully",
+            user: {
+                id: updatedUser._id,
+                email: updatedUser.email,
+                userType: 'private',
+                teamId: null,
+                teamRole: null
+            }
+        });
+
+    } catch (err) {
+        console.error("Disperse team error:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 module.exports = router;

@@ -1,22 +1,32 @@
 .app {
-  min-height: 100vh;
   display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  width: 100%;
+}
+
+.app-public {
   flex-direction: column;
 }
 
-* {
-  box-sizing: border-box;
+.app-dashboard {
+  flex-direction: row;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  width: 100%;
+  transition: margin-left var(--transition-slow);
 }
 
-code {
-  font-family: 'Courier New', monospace;
+.app-main.collapsed {
+  margin-left: var(--sidebar-collapsed);
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    margin-left: 0;
+  }
 }

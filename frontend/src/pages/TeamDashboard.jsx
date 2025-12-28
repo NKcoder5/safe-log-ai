@@ -2,8 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import EmptyState from '../components/EmptyState';
+import LoadingState from '../components/LoadingState';
+import {
+    Users,
+    Crown,
+    UserPlus,
+    Copy,
+    Check,
+    Trash2,
+    LogOut,
+    Shield
+} from 'lucide-react';
 import './Team.css';
-import './TeamInviteCode.css';
 
 const TeamDashboard = () => {
     const { userType, teamId, teamRole, userId, refreshAuth } = useAuth();
@@ -18,19 +29,14 @@ const TeamDashboard = () => {
     const [creating, setCreating] = useState(false);
     const [copySuccess, setCopySuccess] = useState(false);
 
-    console.log('🎯 TeamDashboard render - teamId:', teamId, 'team:', team?.name);
-
     const fetchTeamInfo = useCallback(async () => {
-        console.log('📡 Fetching team info for teamId:', teamId);
         setLoading(true);
         try {
             const response = await api.get('/teams/my-team');
-            console.log('✅ Team info fetched:', response.data.team);
             setTeam(response.data.team);
             setMembers(response.data.members);
             setError('');
         } catch (err) {
-            console.error('❌ Failed to fetch team:', err);
             setError(err.response?.data?.error || 'Failed to load team info');
             setTeam(null);
             setMembers([]);
@@ -40,11 +46,9 @@ const TeamDashboard = () => {
     }, [teamId]);
 
     useEffect(() => {
-        console.log('🔄 useEffect triggered - teamId:', teamId);
         if (teamId) {
             fetchTeamInfo();
         } else {
-            console.log('⚠️  No teamId, clearing team state');
             setLoading(false);
             setTeam(null);
             setMembers([]);
@@ -57,37 +61,21 @@ const TeamDashboard = () => {
         setError('');
 
         try {
-            console.log('🚀 Creating team:', teamName);
             const response = await api.post('/teams/create', {
                 name: teamName,
                 description: teamDescription
             });
 
-            console.log('✅ Team creation response:', response.data);
-            console.log('   - Team:', response.data.team);
-            console.log('   - User:', response.data.user);
-            console.log('   - Token:', response.data.token ? 'present' : 'MISSING');
-
-            // Update auth context with new token
             if (response.data.token) {
-                console.log('🔄 Calling refreshAuth...');
                 refreshAuth(response.data.token);
-            } else {
-                console.error('❌ NO TOKEN IN RESPONSE!');
             }
 
-            // Set team data immediately
-            const teamData = response.data.team;
-            const userData = response.data.user;
-
-            setTeam(teamData);
-
-            // Initialize members
-            if (userData && userData.id) {
+            setTeam(response.data.team);
+            if (response.data.user) {
                 setMembers([{
-                    _id: userData.id,
-                    email: userData.email,
-                    teamRole: userData.teamRole || 'admin',
+                    _id: response.data.user.id,
+                    email: response.data.user.email,
+                    teamRole: response.data.user.teamRole || 'admin',
                     createdAt: new Date().toISOString()
                 }]);
             }
@@ -95,11 +83,7 @@ const TeamDashboard = () => {
             setShowCreateForm(false);
             setTeamName('');
             setTeamDescription('');
-
-            console.log('✅ Team creation complete!');
-
         } catch (err) {
-            console.error('❌ Team creation error:', err);
             setError(err.response?.data?.error || 'Failed to create team');
         } finally {
             setCreating(false);
@@ -119,11 +103,9 @@ const TeamDashboard = () => {
 
         try {
             const response = await api.delete('/teams/leave');
-
             if (response.data.token) {
                 refreshAuth(response.data.token);
             }
-
             setTeam(null);
             setMembers([]);
             navigate('/dashboard');
@@ -144,33 +126,47 @@ const TeamDashboard = () => {
     };
 
     if (loading) {
-        console.log('⏳ Showing loading state');
-        return <div className="team-dashboard"><div className="loading">Loading...</div></div>;
+        return (
+            <div className="team-page">
+                <LoadingState size="large" message="Loading team information..." />
+            </div>
+        );
     }
 
     // No team - show create form
     if (!teamId) {
-        console.log('📝 Showing create form (no teamId)');
         return (
-            <div className="team-dashboard">
+            <div className="team-page">
                 <div className="team-container">
-                    <h1>Team Management</h1>
-                    <p className="team-subtitle">Create a team to collaborate with others</p>
+                    <header className="team-header">
+                        <h1 className="team-title">
+                            <Users size={32} />
+                            Team Management
+                        </h1>
+                        <p className="team-subtitle">Create a team to collaborate with others</p>
+                    </header>
 
-                    {error && <div className="error-message">{error}</div>}
+                    {error && (
+                        <div className="error-banner">
+                            <p>{error}</p>
+                        </div>
+                    )}
 
                     {!showCreateForm ? (
-                        <div className="no-team">
-                            <p>You're not part of any team yet.</p>
-                            <button onClick={() => setShowCreateForm(true)} className="btn btn-primary">
-                                Create Team
-                            </button>
-                            <p className="hint">Or ask your team admin for an invite code during signup</p>
-                        </div>
+                        <EmptyState
+                            type="team"
+                            title="No Team Yet"
+                            description="Create a team to share error logs and solutions with your colleagues"
+                            action="Create Team"
+                            onAction={() => setShowCreateForm(true)}
+                        />
                     ) : (
                         <form onSubmit={handleCreateTeam} className="team-form">
                             <div className="form-group">
-                                <label htmlFor="teamName">Team Name</label>
+                                <label htmlFor="teamName" className="form-label">
+                                    <Users size={18} />
+                                    <span>Team Name</span>
+                                </label>
                                 <input
                                     type="text"
                                     id="teamName"
@@ -178,25 +174,33 @@ const TeamDashboard = () => {
                                     onChange={(e) => setTeamName(e.target.value)}
                                     required
                                     placeholder="Engineering Team"
+                                    className="form-input"
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="teamDescription">Description (Optional)</label>
+                                <label htmlFor="teamDescription" className="form-label">
+                                    <span>Description (Optional)</span>
+                                </label>
                                 <textarea
                                     id="teamDescription"
                                     value={teamDescription}
                                     onChange={(e) => setTeamDescription(e.target.value)}
                                     placeholder="Describe your team..."
                                     rows={3}
+                                    className="form-textarea"
                                 />
                             </div>
 
                             <div className="form-actions">
-                                <button type="submit" className="btn btn-primary" disabled={creating}>
+                                <button type="submit" className="btn-primary" disabled={creating}>
                                     {creating ? 'Creating...' : 'Create Team'}
                                 </button>
-                                <button type="button" onClick={() => setShowCreateForm(false)} className="btn btn-secondary">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCreateForm(false)}
+                                    className="btn-secondary"
+                                >
                                     Cancel
                                 </button>
                             </div>
@@ -208,67 +212,105 @@ const TeamDashboard = () => {
     }
 
     // Has team - show team info
-    console.log('👥 Showing team view');
     return (
-        <div className="team-dashboard">
+        <div className="team-page">
             <div className="team-container">
-                <div className="team-header">
+                {/* Header */}
+                <header className="team-header">
                     <div>
-                        <h1>{team?.name || 'Loading...'}</h1>
+                        <h1 className="team-title">
+                            <Users size={32} />
+                            {team?.name || 'Loading...'}
+                        </h1>
                         <p className="team-subtitle">{team?.description || 'No description'}</p>
                     </div>
-                    <div className="team-role-badge">
-                        {teamRole === 'admin' ? '👑 Admin' : '👤 Member'}
+                    <div className={`role-badge ${teamRole}`}>
+                        {teamRole === 'admin' ? (
+                            <>
+                                <Crown size={16} />
+                                <span>Admin</span>
+                            </>
+                        ) : (
+                            <>
+                                <Shield size={16} />
+                                <span>Member</span>
+                            </>
+                        )}
                     </div>
-                </div>
+                </header>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && (
+                    <div className="error-banner">
+                        <p>{error}</p>
+                    </div>
+                )}
 
-                {/* Debug Info - Commented out for production
-                <div style={{ background: '#f0f0f0', padding: '10px', marginBottom: '10px', fontSize: '12px' }}>
-                    <strong>Debug Info:</strong><br />
-                    teamId from context: {teamId || 'null'}<br />
-                    team state: {team ? team.name : 'null'}<br />
-                    inviteCode: {team?.inviteCode || 'not loaded'}<br />
-                    localStorage teamId: {localStorage.getItem('teamId') || 'not set'}
-                </div>
-                */}
-
-                {/* Prominent Invite Code Section - ADMIN ONLY */}
+                {/* Invite Code Section - Admin Only */}
                 {teamRole === 'admin' && (
-                    <div className="invite-code-section-prominent">
-                        <div className="invite-code-header">
-                            <h2>🔑 Team Invite Code</h2>
-                            <p className="invite-hint">Share this code with others to invite them to your team</p>
+                    <div className="invite-section">
+                        <div className="invite-header">
+                            <h2 className="invite-title">
+                                <UserPlus size={24} />
+                                Team Invite Code
+                            </h2>
+                            <p className="invite-description">
+                                Share this code with others to invite them to your team
+                            </p>
                         </div>
                         {team?.inviteCode ? (
                             <div className="invite-code-box">
-                                <div className="invite-code-large">{team.inviteCode}</div>
-                                <button onClick={handleCopyInviteCode} className="btn-copy">
-                                    {copySuccess ? '✓ Copied!' : '📋 Copy Code'}
+                                <code className="invite-code">{team.inviteCode}</code>
+                                <button onClick={handleCopyInviteCode} className="copy-btn">
+                                    {copySuccess ? (
+                                        <>
+                                            <Check size={18} />
+                                            <span>Copied!</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Copy size={18} />
+                                            <span>Copy Code</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         ) : (
-                            <div className="loading">Loading invite code...</div>
+                            <LoadingState type="pulse" message="Loading invite code..." />
                         )}
                     </div>
                 )}
 
                 {/* Team Members */}
-                <div className="team-members-section">
-                    <h2>Team Members ({members.length})</h2>
-                    <div className="members-list">
+                <div className="members-section">
+                    <h2 className="members-title">
+                        <Users size={24} />
+                        Team Members ({members.length})
+                    </h2>
+                    <div className="members-grid">
                         {members && members.length > 0 ? (
-                            members.map((member) => (
+                            members.map((member) =>
                                 member && member._id ? (
                                     <div key={member._id} className="member-card">
+                                        <div className="member-avatar">
+                                            {member.email?.charAt(0).toUpperCase() || 'U'}
+                                        </div>
                                         <div className="member-info">
                                             <div className="member-email">{member.email || 'Unknown'}</div>
                                             <div className="member-meta">
-                                                <span className={`role-badge ${member.teamRole}`}>
-                                                    {member.teamRole === 'admin' ? '👑 Admin' : '👤 Member'}
+                                                <span className={`member-role ${member.teamRole}`}>
+                                                    {member.teamRole === 'admin' ? (
+                                                        <>
+                                                            <Crown size={12} />
+                                                            Admin
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Shield size={12} />
+                                                            Member
+                                                        </>
+                                                    )}
                                                 </span>
-                                                <span className="join-date">
+                                                <span className="member-joined">
                                                     Joined {member.createdAt ? new Date(member.createdAt).toLocaleDateString() : 'Recently'}
                                                 </span>
                                             </div>
@@ -276,24 +318,26 @@ const TeamDashboard = () => {
                                         {teamRole === 'admin' && member._id !== userId && (
                                             <button
                                                 onClick={() => handleRemoveMember(member._id)}
-                                                className="btn btn-danger btn-sm"
+                                                className="remove-btn"
+                                                aria-label="Remove member"
                                             >
-                                                Remove
+                                                <Trash2 size={18} />
                                             </button>
                                         )}
                                     </div>
                                 ) : null
-                            ))
+                            )
                         ) : (
-                            <div className="loading">Loading members...</div>
+                            <LoadingState type="pulse" message="Loading members..." />
                         )}
                     </div>
                 </div>
 
                 {/* Leave Team */}
                 <div className="team-actions">
-                    <button onClick={handleLeaveTeam} className="btn btn-danger">
-                        Leave Team
+                    <button onClick={handleLeaveTeam} className="btn-danger">
+                        <LogOut size={18} />
+                        <span>Leave Team</span>
                     </button>
                 </div>
             </div>

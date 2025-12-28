@@ -237,6 +237,34 @@ function selectiveMask(text) {
   );
 
   // ========================================
+  // ID MASKS (PAYMENT, USER, ETC.)
+  // ========================================
+
+  // 22. Payment/Transaction IDs (Stripe-like prefixes or labeled)
+  // Matches: pi_123..., ch_123..., txn_123...
+  masked = masked.replace(
+    /\b((?:pi|ch|py|txn|re)_[a-zA-Z0-9]{10,})\b/g,
+    '<PAYMENT_ID>'
+  );
+  // Matches: payment_id=123, txn_id: "abc"
+  masked = masked.replace(
+    /\b(payment[_-]?id|txn[_-]?id|transaction[_-]?id)\s*[:=]\s*['"]?([a-zA-Z0-9_.-]+)['"]?/gi,
+    '$1=<PAYMENT_ID>'
+  );
+
+  // 23. User/Customer IDs (Stripe-like prefixes or labeled)
+  // Matches: usr_123..., cus_123...
+  masked = masked.replace(
+    /\b((?:usr|cus|acc)_[a-zA-Z0-9]{10,})\b/g,
+    '<USER_ID>'
+  );
+  // Matches: user_id=123, customer_id: "abc"
+  masked = masked.replace(
+    /\b(user[_-]?id|customer[_-]?id|account[_-]?id|uid)\s*[:=]\s*['"]?([a-zA-Z0-9_.-]+)['"]?/gi,
+    '$1=<USER_ID>'
+  );
+
+  // ========================================
   // PRESERVE (DO NOT MASK)
   // ========================================
   // - File paths (e.g., UPIService.java:142)

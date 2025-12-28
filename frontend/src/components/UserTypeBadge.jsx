@@ -6,25 +6,25 @@ const UserTypeBadge = ({ userType, teamName }) => {
         switch (userType) {
             case 'public':
                 return {
-                    label: 'Public User',
+                    label: 'Public',
                     className: 'badge-public',
-                    icon: <Globe className="w-4 h-4" />,
-                    description: 'Sharing solutions globally'
+                    icon: <Globe size={16} />,
+                    description: 'Solutions shared globally with all public users'
                 };
             case 'team':
                 return {
-                    label: teamName || 'Team User',
+                    label: teamName || 'Team',
                     className: 'badge-team',
-                    icon: <Users className="w-4 h-4" />,
-                    description: 'Sharing with team members'
+                    icon: <Users size={16} />,
+                    description: 'Solutions shared only with team members'
                 };
             case 'private':
             default:
                 return {
-                    label: 'Private User',
+                    label: 'Private',
                     className: 'badge-private',
-                    icon: <User className="w-4 h-4" />,
-                    description: 'Complete privacy'
+                    icon: <Shield size={16} />,
+                    description: 'Solutions are completely private and never shared'
                 };
         }
     };
@@ -32,15 +32,9 @@ const UserTypeBadge = ({ userType, teamName }) => {
     const config = getBadgeConfig();
 
     return (
-        <div className={`user-type-badge ${config.className}`} title={config.description}>
-            <div className="badge-icon-wrapper">
-                {config.icon}
-            </div>
-            <div className="badge-content">
-                <span className="badge-label">{config.label}</span>
-                <span className="badge-description">{config.description}</span>
-            </div>
-            <div className="badge-glow"></div>
+        <div className={`user-type-badge badge ${config.className}`} title={config.description}>
+            {config.icon}
+            <span>{config.label}</span>
         </div>
     );
 };

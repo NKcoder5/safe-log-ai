@@ -1,206 +1,469 @@
-.team-dashboard {
-    min-height: calc(100vh - 60px);
-    padding: 2rem;
-    background: #f5f5f5;
+.team-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    padding: var(--space-6);
 }
 
 .team-container {
-    max-width: 800px;
+    max-width: var(--max-width-content);
     margin: 0 auto;
-    background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
 }
 
+/* Header */
 .team-header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid #f0f0f0;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    animation: fadeInDown 400ms ease;
 }
 
-.team-header h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 0.5rem 0;
+.team-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.team-title svg {
+    color: var(--accent-teal);
 }
 
 .team-subtitle {
-    color: #666;
+    font-size: var(--text-lg);
+    color: var(--text-tertiary);
     margin: 0;
-    font-size: 0.9rem;
-}
-
-.team-role-badge {
-    padding: 0.5rem 1rem;
-    background: #667eea;
-    color: white;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.invite-code-section {
-    margin-bottom: 2rem;
-}
-
-.invite-code-section h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 1rem 0;
-}
-
-.invite-code-display {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.invite-code-display code {
-    flex: 1;
-    padding: 0.75rem;
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    color: #667eea;
-}
-
-.hint {
-    font-size: 0.85rem;
-    color: #888;
-    margin: 0.5rem 0 0 0;
-}
-
-.team-members-section {
-    margin-bottom: 2rem;
-}
-
-.team-members-section h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 1rem 0;
-}
-
-.members-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.member-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: #f9f9f9;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.member-card:hover {
-    background: #f5f5f5;
-    border-color: #d0d0d0;
-}
-
-.member-info {
-    flex: 1;
-}
-
-.member-email {
-    font-weight: 500;
-    color: #1a1a1a;
-    margin-bottom: 0.25rem;
-}
-
-.member-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.85rem;
-    color: #666;
 }
 
 .role-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
 }
 
 .role-badge.admin {
-    background: #ffeaa7;
-    color: #d63031;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    color: var(--warning);
 }
 
 .role-badge.member {
-    background: #dfe6e9;
-    color: #2d3436;
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    color: var(--info);
 }
 
-.join-date {
-    color: #999;
-}
-
-.team-actions {
-    padding-top: 1.5rem;
-    border-top: 2px solid #f0f0f0;
-}
-
-.no-team {
-    text-align: center;
-    padding: 3rem 1rem;
-}
-
-.no-team p {
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
+/* Form */
 .team-form {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--space-5);
+    animation: fadeInUp 400ms ease 200ms both;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    font-family: var(--font-sans);
+    transition: all var(--transition-base);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px var(--accent-blue-muted);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .form-actions {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-3);
+    padding-top: var(--space-2);
 }
 
-.btn-secondary {
-    background: #e0e0e0;
-    color: #333;
-}
-
-.btn-secondary:hover {
-    background: #d0d0d0;
-}
-
+/* Buttons */
+.btn-primary,
+.btn-secondary,
 .btn-danger {
-    background: #ff6b6b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-primary {
+    background: var(--accent-blue);
     color: white;
 }
 
-.btn-danger:hover:not(:disabled) {
-    background: #ee5a52;
+.btn-primary:hover:not(:disabled) {
+    background: var(--accent-blue-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-.btn-sm {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
+.btn-secondary {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
 }
 
-.loading {
-    text-align: center;
-    padding: 3rem;
-    color: #666;
+.btn-secondary:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-medium);
+}
+
+.btn-danger {
+    background: var(--error);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Invite Section */
+.invite-section {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    animation: fadeInUp 400ms ease 200ms both;
+}
+
+.invite-header {
+    margin-bottom: var(--space-4);
+}
+
+.invite-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.invite-title svg {
+    color: var(--accent-purple);
+}
+
+.invite-description {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    margin: 0;
+}
+
+.invite-code-box {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+}
+
+.invite-code {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--accent-blue);
+    letter-spacing: 0.05em;
+}
+
+.copy-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+}
+
+.copy-btn:hover {
+    background: var(--accent-blue-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Members Section */
+.members-section {
+    animation: fadeInUp 400ms ease 300ms both;
+}
+
+.members-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+}
+
+.members-title svg {
+    color: var(--accent-teal);
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-4);
+}
+
+.member-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+}
+
+.member-card:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: var(--accent-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+}
+
+.member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.member-email {
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: var(--space-1);
+}
+
+.member-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+}
+
+.member-role {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-medium);
+}
+
+.member-role.admin {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.member-role.member {
+    background: var(--info-bg);
+    color: var(--info);
+}
+
+.member-joined {
+    color: var(--text-muted);
+}
+
+.remove-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-md);
+    color: var(--error);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+}
+
+.remove-btn:hover {
+    background: var(--error);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Team Actions */
+.team-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    animation: fadeInUp 400ms ease 400ms both;
+}
+
+/* Error Banner */
+.error-banner {
+    padding: var(--space-4);
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-lg);
+    color: var(--error);
+    animation: fadeInUp 300ms ease;
+}
+
+.error-banner p {
+    margin: 0;
+    font-size: var(--text-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .team-page {
+        padding: var(--space-4);
+    }
+
+    .team-container {
+        gap: var(--space-4);
+    }
+
+    .team-title {
+        font-size: var(--text-3xl);
+    }
+
+    .team-subtitle {
+        font-size: var(--text-base);
+    }
+
+    .team-header {
+        flex-direction: column;
+    }
+
+    .team-form {
+        padding: var(--space-4);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        width: 100%;
+    }
+
+    .invite-section {
+        padding: var(--space-4);
+    }
+
+    .invite-code-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .invite-code {
+        font-size: var(--text-xl);
+        text-align: center;
+    }
+
+    .copy-btn {
+        justify-content: center;
+    }
+
+    .members-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .team-actions {
+        justify-content: stretch;
+    }
+
+    .team-actions .btn-danger {
+        width: 100%;
+    }
 }

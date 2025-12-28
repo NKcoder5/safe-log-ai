@@ -9,11 +9,15 @@ const authenticateToken = require("../middleware/auth");
 const NIM_CHAT_COMPLETIONS_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 const NIM_MODEL = "meta/llama-4-maverick-17b-128e-instruct";
 
-async function generateAiSolution(maskedLog) {
+async function generateAiSolution(maskedLog, multiError = false) {
   const apiKey = process.env.NVIDIA_NIM_API_KEY || process.env.NIM_API_KEY || process.env.NVIDIA_API_KEY;
   if (!apiKey) {
     throw new Error("Missing NVIDIA NIM API key");
   }
+
+  const systemContent = multiError
+    ? "You are a backend debugging assistant. The log contains multiple independent errors. Identify each distinct error. For each, provide a JSON object with: { summary, rootCause, solution, preventiveMeasures }. Return ONLY a JSON array of these objects. No markdown."
+    : "You are a backend debugging assistant. You will be given a masked error log. Only use evidence present in the log. Do not invent stack traces, line numbers, files, services, or runtime context. Output plain text only (no markdown). Provide: (1) Root cause, (2) Why it occurred, (3) Step-by-step solution, (4) Preventive measures.";
 
   const response = await axios.post(
     NIM_CHAT_COMPLETIONS_URL,
@@ -22,16 +26,15 @@ async function generateAiSolution(maskedLog) {
       messages: [
         {
           role: "system",
-          content:
-            "You are a backend debugging assistant. You will be given a masked error log. Only use evidence present in the log. Do not invent stack traces, line numbers, files, services, or runtime context. Output plain text only (no markdown). Provide: (1) Root cause, (2) Why it occurred, (3) Step-by-step solution, (4) Preventive measures."
+          content: systemContent
         },
         { role: "user", content: `Masked error log:\n${maskedLog}` }
       ],
-      max_tokens: 512,
+      max_tokens: 1024, // Increased for multi-error
       stream: false
     },
     {
-      timeout: 12000,
+      timeout: 20000, // Increased timeout
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
@@ -53,14 +56,15 @@ async function generateAiSolution(maskedLog) {
 
 // Submit error log
 router.post("/submit", authenticateToken, async (req, res) => {
-  const { rawLog } = req.body;
+  const { rawLog, multiError } = req.body;
   const userId = req.userId;
   const userType = req.userType;
   const teamId = req.teamId;
 
   try {
     const maskedLog = await maskLog(rawLog);
-    const fingerprint = generateFingerprint(maskedLog);
+    // Include multiError flag in fingerprint to treat single vs multi analysis as different cache entries
+    const fingerprint = generateFingerprint(maskedLog + (multiError ? '_MULTI' : ''));
     const legacyFingerprint = generateFingerprint(rawLog);
 
     let cacheQuery;
@@ -107,11 +111,12 @@ router.post("/submit", authenticateToken, async (req, res) => {
         originalLog: rawLog,                 // ✅ Current user's log (privacy preserved)
         // maskedLog: NOT included - only shown for first submission
         hitCount: existingLog.hitCount,
-        _id: existingLog._id
+        _id: existingLog._id,
+        isMultiError: multiError || false
       });
     }
 
-    const aiSolution = await generateAiSolution(maskedLog);
+    const aiSolution = await generateAiSolution(maskedLog, multiError);
 
     const newLog = new ErrorLog({
       userId,
@@ -132,7 +137,8 @@ router.post("/submit", authenticateToken, async (req, res) => {
       originalLog: newLog.originalLog,  // ADDED: Return original to user
       maskedLog: newLog.maskedLog,
       hitCount: newLog.hitCount,
-      _id: newLog._id
+      _id: newLog._id,
+      isMultiError: multiError || false
     });
 
   } catch (err) {

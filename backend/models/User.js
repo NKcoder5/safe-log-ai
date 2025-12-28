@@ -29,18 +29,22 @@ const UserSchema = new mongoose.Schema({
     type: String,
     enum: ['member', 'admin'],
     default: 'member'
+  },
+  lastPasswordChange: {
+    type: Date,
+    default: Date.now
   }
 }, { timestamps: true });
 
 // Compound index for efficient team queries
 UserSchema.index({ userType: 1, teamId: 1 });
 
-UserSchema.pre("save", async function() {
+UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-UserSchema.methods.comparePassword = async function(candidatePassword) {
+UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
