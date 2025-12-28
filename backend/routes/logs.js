@@ -204,9 +204,9 @@ router.get('/history', authenticateToken, async (req, res) => {
 
     const logs = await ErrorLog.find(query)
       .sort({ createdAt: -1 })
-      .select('_id maskedLog aiSolution hitCount createdAt updatedAt userId');
+      .select('_id originalLog maskedLog aiSolution hitCount createdAt updatedAt userId');
 
-    res.json(logs);
+    res.json({ logs });
   } catch (err) {
     console.error("History error:", err);
     res.status(500).json({ error: "Server error" });

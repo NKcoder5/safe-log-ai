@@ -24,7 +24,8 @@ const History = () => {
     try {
       setLoading(true);
       const response = await api.get('/logs/history');
-      setLogs(response.data.logs || []);
+      const data = response.data;
+      setLogs(Array.isArray(data) ? data : (data.logs || []));
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to fetch history');
     } finally {
@@ -39,7 +40,7 @@ const History = () => {
       return (
         log.originalLog?.toLowerCase().includes(searchLower) ||
         log.maskedLog?.toLowerCase().includes(searchLower) ||
-        log.solution?.toLowerCase().includes(searchLower)
+        log.aiSolution?.toLowerCase().includes(searchLower)
       );
     })
     .sort((a, b) => {
@@ -47,10 +48,10 @@ const History = () => {
         case 'frequent':
           return (b.hitCount || 0) - (a.hitCount || 0);
         case 'oldest':
-          return new Date(a.timestamp) - new Date(b.timestamp);
+          return new Date(a.createdAt) - new Date(b.createdAt);
         case 'recent':
         default:
-          return new Date(b.timestamp) - new Date(a.timestamp);
+          return new Date(b.createdAt) - new Date(a.createdAt);
       }
     });
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Hash, TrendingUp, Shield } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Hash, TrendingUp, Shield, Sparkles } from 'lucide-react';
 import './LogCard.css';
 
 const LogCard = ({
@@ -52,10 +52,10 @@ const LogCard = ({
 
             {/* Card Metadata - Always Visible */}
             <div className="log-card-meta">
-                {log.timestamp && (
+                {log.createdAt && (
                     <div className="log-meta-item">
                         <Clock size={14} />
-                        <span>{formatTimestamp(log.timestamp)}</span>
+                        <span>{formatTimestamp(log.createdAt)}</span>
                     </div>
                 )}
 
@@ -77,6 +77,19 @@ const LogCard = ({
             {/* Expanded Content */}
             {expanded && (
                 <div className="log-card-content">
+                    {/* AI Solution */}
+                    {log.aiSolution && (
+                        <div className="log-section solution">
+                            <div className="log-section-header">
+                                <Sparkles size={16} className="solution-icon" />
+                                <span className="log-section-title">AI Solution</span>
+                            </div>
+                            <div className="solution-display">
+                                {log.aiSolution}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Original Log */}
                     {log.originalLog && (
                         <div className="log-section">
