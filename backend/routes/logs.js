@@ -213,4 +213,43 @@ router.get('/history', authenticateToken, async (req, res) => {
   }
 });
 
+// Get analytics stats
+router.get('/analytics', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const userType = req.userType;
+    const teamId = req.teamId;
+
+    let query;
+    if (userType === 'public') {
+      query = { userType: 'public' };
+    } else if (userType === 'private') {
+      query = { userId };
+    } else if (userType === 'team') {
+      query = { userType: 'team', teamId };
+    }
+
+    // Basic stats
+    const logs = await ErrorLog.find(query);
+    const totalLogs = logs.length;
+    const cacheHits = logs.reduce((acc, log) => acc + (log.hitCount - 1), 0);
+    const cacheHitRate = totalLogs > 0 ? Math.round((cacheHits / (totalLogs + cacheHits)) * 100) : 0;
+
+    // Weekly stats
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const thisWeekLogs = logs.filter(log => new Date(log.createdAt) >= oneWeekAgo).length;
+
+    res.json({
+      totalLogs,
+      cacheHits,
+      cacheHitRate,
+      thisWeekLogs
+    });
+  } catch (err) {
+    console.error("Analytics error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;
