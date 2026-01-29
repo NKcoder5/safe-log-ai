@@ -56,6 +56,7 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
                         required
                         placeholder="your@email.com"
                         className="form-input"
+                        autoComplete="off"
                     />
                 </div>
             </div>
@@ -75,6 +76,7 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
                         placeholder="••••••••"
                         minLength={6}
                         className="form-input"
+                        autoComplete="off"
                     />
                     <button
                         type="button"

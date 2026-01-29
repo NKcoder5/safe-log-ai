@@ -99,6 +99,7 @@ const SignupForm = ({ onSuccess, onSwitchToLogin }) => {
                         required
                         placeholder="your@email.com"
                         className="form-input"
+                        autoComplete="off"
                     />
                 </div>
             </div>
@@ -118,6 +119,7 @@ const SignupForm = ({ onSuccess, onSwitchToLogin }) => {
                         placeholder="••••••••"
                         minLength={6}
                         className="form-input"
+                        autoComplete="off"
                     />
                     <button
                         type="button"

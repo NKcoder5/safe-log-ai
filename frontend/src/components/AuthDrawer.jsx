@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Shield } from 'lucide-react';
+import { X, Shield, CheckCircle } from 'lucide-react';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import './AuthDrawer.css';
@@ -8,12 +8,14 @@ import './AuthDrawer.css';
 const AuthDrawer = ({ isOpen, onClose, initialMode = 'login' }) => {
     const [mode, setMode] = useState(initialMode);
     const [isClosing, setIsClosing] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         if (isOpen) {
             setMode(initialMode);
             setIsClosing(false);
+            setSuccessMessage('');
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
@@ -28,12 +30,18 @@ const AuthDrawer = ({ isOpen, onClose, initialMode = 'login' }) => {
         setTimeout(() => {
             onClose();
             setIsClosing(false);
+            setSuccessMessage('');
         }, 300);
     };
 
     const handleSuccess = () => {
         handleClose();
         navigate('/dashboard');
+    };
+
+    const handleSignupSuccess = () => {
+        setSuccessMessage('Account created successfully! Please sign in.');
+        setMode('login');
     };
 
     if (!isOpen && !isClosing) return null;
@@ -56,19 +64,42 @@ const AuthDrawer = ({ isOpen, onClose, initialMode = 'login' }) => {
                 <div className="auth-drawer-tabs">
                     <button
                         className={`auth-drawer-tab ${mode === 'login' ? 'active' : ''}`}
-                        onClick={() => setMode('login')}
+                        onClick={() => {
+                            setMode('login');
+                            setSuccessMessage('');
+                        }}
                     >
                         Sign In
                     </button>
                     <button
                         className={`auth-drawer-tab ${mode === 'signup' ? 'active' : ''}`}
-                        onClick={() => setMode('signup')}
+                        onClick={() => {
+                            setMode('signup');
+                            setSuccessMessage('');
+                        }}
                     >
                         Sign Up
                     </button>
                 </div>
 
                 <div className="auth-drawer-content">
+                    {successMessage && (
+                        <div className="auth-success-message" style={{
+                            padding: '12px',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            border: '1px solid rgba(34, 197, 94, 0.2)',
+                            borderRadius: '8px',
+                            color: '#22c55e',
+                            marginBottom: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '14px'
+                        }}>
+                            <CheckCircle size={18} />
+                            {successMessage}
+                        </div>
+                    )}
                     {/* Wrap in auth-page to inherit input styles from Auth.css, but override layout in inline style */}
                     <div className="auth-page" style={{
                         minHeight: 'auto',
@@ -79,13 +110,21 @@ const AuthDrawer = ({ isOpen, onClose, initialMode = 'login' }) => {
                     }}>
                         {mode === 'login' ? (
                             <LoginForm
+                                key={`${isOpen}-${mode}`}
                                 onSuccess={handleSuccess}
-                                onSwitchToSignup={() => setMode('signup')}
+                                onSwitchToSignup={() => {
+                                    setMode('signup');
+                                    setSuccessMessage('');
+                                }}
                             />
                         ) : (
                             <SignupForm
-                                onSuccess={handleSuccess}
-                                onSwitchToLogin={() => setMode('login')}
+                                key={`${isOpen}-${mode}`}
+                                onSuccess={handleSignupSuccess}
+                                onSwitchToLogin={() => {
+                                    setMode('login');
+                                    setSuccessMessage('');
+                                }}
                             />
                         )}
                     </div>

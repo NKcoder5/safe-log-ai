@@ -93,29 +93,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await api.post('/auth/signup', payload);
-      const { token: newToken, user } = response.data;
-
-      setToken(newToken);
-      localStorage.setItem('token', newToken);
-
-      const decoded = jwtDecode(newToken);
-      setUserId(decoded.userId);
-      setUserEmail(decoded.email);
-      setUserType(decoded.userType || 'private');
-      setTeamId(decoded.teamId || null);
-      setTeamRole(decoded.teamRole || null);
-
-      localStorage.setItem('userId', decoded.userId);
-      localStorage.setItem('userEmail', decoded.email);
-      localStorage.setItem('userType', decoded.userType || 'private');
-      if (decoded.teamId) {
-        localStorage.setItem('teamId', decoded.teamId);
-      } else {
-        localStorage.removeItem('teamId');
-      }
-      localStorage.setItem('teamRole', decoded.teamRole || '');
-
-      return { success: true, user };
+      return { success: true, message: response.data.message || 'Signup successful' };
     } catch (error) {
       return {
         success: false,
