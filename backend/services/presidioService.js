@@ -23,9 +23,9 @@ function selectiveMask(text) {
   );
 
   // Labeled secrets (Password, Secret, etc.)
-  // Added: Password, Passwd, Credentials, AccessToken, AuthToken, JWT, SessionID, Cookie, CSRF, CVV, PIN, SSN
+  // Added: EnteredPassword, RegisteredPassword, UserPassword, etc.
   masked = masked.replace(
-    /\b(Password|Passwd|SecretAccessKey|Secret|PrivateKey|private[_-]?key|api[_-]?secret|API\s*Key|AccessToken|AuthToken|JWT|Session[_-]?ID|CSRF[_-]?Token|Cookie|CVV|PIN|SSN|SocialSecurity)\s*[:=]\s*([^\s;]{4,})\b/gi,
+    /\b(\w*Password|Passwd|SecretAccessKey|Secret|PrivateKey|private[_-]?key|api[_-]?secret|API\s*Key|AccessToken|AuthToken|SessionToken|JWT|Session[_-]?ID|CSRF[_-]?Token|Cookie|CVV|PIN|SSN|SocialSecurity)\s*[:=]\s*([^\s;]{4,})\b/gi,
     '$1: <SENSITIVE_DATA>'
   );
 
@@ -33,7 +33,7 @@ function selectiveMask(text) {
   masked = masked.replace(/"(password|secret|token|cvv|auth|credential|pin|ssn)"\s*:\s*"[^"]+"/gi, '"$1": "<MASKED>"');
 
   // Bearer Tokens & JWTs (generic detection for long b64-like strings or labeled)
-  masked = masked.replace(/\b(Bearer|Token|Authorization)\s*[:=]?\s+([a-zA-Z0-9\._\-]{10,})\b/gi, '$1: <TOKEN>');
+  masked = masked.replace(/\b(Bearer|Token|Authorization|Session[_-]?Token)\s*[:=]?\s+([a-zA-Z0-9\._\-]{10,})\b/gi, '$1: <TOKEN>');
 
   // Specific JWT pattern detection (header.payload.signature)
   masked = masked.replace(/\beyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\b/g, '<JWT_TOKEN>');
@@ -101,7 +101,8 @@ function selectiveMask(text) {
   masked = masked.replace(/\b[A-Z]{5}\d{4}[A-Z]\b/g, '<PAN_CARD>');
 
   // Phone Numbers / Mobile / Contact
-  masked = masked.replace(/\b(Phone|Mobile|Contact|WhatsApp)\s*[:=]\s*(\+?\d[\d\s-]{8,15})\b/gi, '$1: <PHONE>');
+  // Using a more aggressive match for the value part when labeled
+  masked = masked.replace(/\b(Phone|Mobile|Contact|WhatsApp|MobileNumber)\s*[:=]\s*([^\s,;]{8,18})\b/gi, '$1: <PHONE>');
   masked = masked.replace(/(\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}\b/g, '<PHONE>');
 
   // Email
