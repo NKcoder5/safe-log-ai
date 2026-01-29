@@ -1,0 +1,10 @@
+CRITICAL ERROR: Payment Gateway Failure
+Timestamp: 2026-01-29 21:12:33
+UserID: <USER_ID>
+CustomerName: <MASKED_DATA>
+EmailAddress: <EMAIL>
+AccountUsername: <MASKED_DATA>
+AccountPassword: <SENSITIVE_DATA>
+CardLastFour: <SENSITIVE_DATA>
+BillingIP: <IP_ADDRESS>
+Trace: PaymentProcessor.process(PaymentProcessor.java:203)

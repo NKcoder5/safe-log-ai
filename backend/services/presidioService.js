@@ -136,9 +136,16 @@ function selectiveMask(text) {
   // ========================================
 
   // Generic Username/Name labeling
+  // Added: AccountUsername, MemberName, etc.
   masked = masked.replace(
-    /\b(Username|User\s*Name|Customer\s*Name|Card\s*Holder|Full\s*Name|DOB|DateOfBirth|BirthDate)\s*[:=]\s*([^\n\r,;]{2,})\b/gi,
+    /\b(\w*Username|\w*UserName|Customer\s*Name|Card\s*Holder|Full\s*Name|DOB|DateOfBirth|BirthDate)\s*[:=]\s*([^\n\r,;]{2,})\b/gi,
     '$1: <MASKED_DATA>'
+  );
+
+  // Card Metadata (Last 4, bin, etc.)
+  masked = masked.replace(
+    /\b(Card[_-]?Last[_-]?Four|Account[_-]?Last[_-]?Four|Card[_-]?Number|Account[_-]?Number|Last4)\s*[:=]\s*(\d{4,16})\b/gi,
+    '$1: <SENSITIVE_DATA>'
   );
 
   // Multi-word names (Title Case)
