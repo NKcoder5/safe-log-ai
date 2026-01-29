@@ -23,9 +23,9 @@ function selectiveMask(text) {
   );
 
   // Labeled secrets (Password, Secret, etc.)
-  // Added: SessionKey, \w*Key variants
+  // Added: SessionKey, \w*Key variants, Financials (IBAN, Routing, etc.)
   masked = masked.replace(
-    /\b(\w*Password|Passwd|SecretAccessKey|Secret|PrivateKey|private[_-]?key|api[_-]?secret|API\s*Key|\w*Key|AccessToken|AuthToken|SessionToken|JWT|Session[_-]?ID|CSRF[_-]?Token|Cookie|CVV|PIN|SSN|SocialSecurity)\s*[:=]\s*([^\s;]{4,})\b/gi,
+    /\b(\w*Password|Passwd|SecretAccessKey|Secret|PrivateKey|private[_-]?key|api[_-]?secret|API\s*Key|\w*Key|AccessToken|AuthToken|SessionToken|JWT|Session[_-]?ID|CSRF[_-]?Token|Cookie|CVV|PIN|SSN|SocialSecurity|IBAN|RoutingNumber|SwiftCode|Routing[_-]?Number)\s*[:=]\s*([^\s;]{4,})\b/gi,
     '$1: <SENSITIVE_DATA>'
   );
 
@@ -42,10 +42,10 @@ function selectiveMask(text) {
   // 2. TECHNICAL IDENTIFIERS (STRENGTHENED)
   // ========================================
 
-  // User & Account IDs (UserID, account_id, PatientID, etc.)
+  // technical IDs, User IDs, Account variations (UserID, account_id, PatientID, PayrollAccount, etc.)
   masked = masked.replace(
-    /\b(\w*ID|Account[_-]?ID|Profile[_-]?ID|Member[_-]?ID|Client[_-]?ID|Customer[_-]?ID|Sub[_-]?ID)\s*[:=]\s*([a-zA-Z0-9_-]{4,})\b/gi,
-    '$1: <USER_ID>'
+    /\b(\w*ID|Account[_-]?ID|\w*Account|\w*Number|Profile[_-]?ID|Member[_-]?ID|Client[_-]?ID|Customer[_-]?ID|Sub[_-]?ID)\s*[:=]\s*([a-zA-Z0-9_-]{4,})\b/gi,
+    '$1: <SENSITIVE_DATA>'
   );
 
   // Transaction IDs
